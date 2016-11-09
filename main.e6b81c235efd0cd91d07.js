@@ -107,7 +107,7 @@
 			forceFetch: true,
 			environment: _reactRelay2.default.Store,
 			render: (0, _reactRouter.applyRouterMiddleware)(_reactRouterRelay2.default),
-			history: _reactRouter.browserHistory
+			history: _reactRouter.hashHistory
 		},
 		_react2.default.createElement(_reactRouter.Route, { path: '/', component: _ListPage2.default, queries: ViewerQueries }),
 		_react2.default.createElement(_reactRouter.Route, { path: '/create', component: _CreatePokemonPage2.default, queries: ViewerQueries }),
@@ -58477,4 +58477,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=main.ad025f39406cae7d94ee.js.map
+//# sourceMappingURL=main.e6b81c235efd0cd91d07.js.map
