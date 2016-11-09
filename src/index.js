@@ -5,7 +5,7 @@ import PokemonPage from './views/PokemonPage';
 import CreatePokemonPage from './views/CreatePokemonPage';
 import EditPokemonPage from './views/EditPokemonPage';
 import ListPage from './views/ListPage';
-import { Router, Route, browserHistory, applyRouterMiddleware } from 'react-router';
+import { Router, Route, hashHistory, applyRouterMiddleware } from 'react-router';
 import useRelay from 'react-router-relay';
 import './index.css';
 
@@ -20,7 +20,7 @@ ReactDOM.render(
 		forceFetch
 		environment={Relay.Store}
 		render={applyRouterMiddleware(useRelay)}
-		history={browserHistory}
+		history={hashHistory}
 	>
 		<Route path="/" component={ListPage} queries={ViewerQueries} />
 		<Route path="/create" component={CreatePokemonPage} queries={ViewerQueries} />
