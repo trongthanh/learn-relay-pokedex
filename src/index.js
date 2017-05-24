@@ -1,5 +1,5 @@
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import ReactDOM from 'react-dom';
 import PokemonPage from './views/PokemonPage';
 import CreatePokemonPage from './views/CreatePokemonPage';

@@ -1,5 +1,5 @@
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import PokemonCard from '../components/PokemonCard';
 import CreatePokemonMutation from '../mutations/CreatePokemonMutation';
 import classes from './PokemonPage.css';

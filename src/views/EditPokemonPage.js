@@ -1,5 +1,5 @@
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import PokemonCard from '../components/PokemonCard';
 import DeletePokemonMutation from '../mutations/DeletePokemonMutation';
 import UpdatePokemonMutation from '../mutations/UpdatePokemonMutation';
