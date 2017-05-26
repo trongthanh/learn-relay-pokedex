@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classes from './PokemonCard.css';
 import { createFragmentContainer, graphql } from 'react-relay';
 
-class PokemonCard extends React.Component {
+export class PokemonCard extends React.Component {
 
 	static propTypes = {
 		addNew: PropTypes.bool,
@@ -14,6 +14,15 @@ class PokemonCard extends React.Component {
 		}),
 		onNameChange: PropTypes.func,
 		onUrlChange: PropTypes.func,
+	}
+
+	_inputUpdate = (e) => {
+		// console.log('inputupdate', e.target.name, e.target.value);
+		if (e.target.name === 'name') {
+			this.props.onNameChange(e.target.value);
+		} else if (e.target.name === 'url') {
+			this.props.onUrlChange(e.target.value);
+		}
 	}
 
 	render () {
@@ -30,7 +39,8 @@ class PokemonCard extends React.Component {
 						placeholder="Type a name..."
 						value={this.props.pokemon.name}
 						disabled={!editable}
-						onChange={(e) => this.props.onNameChange(e.target.value)}
+						name="name"
+						onChange={this._inputUpdate}
 					/>
 				</div>
 				<div className={classes.imageContainer}>
@@ -43,7 +53,8 @@ class PokemonCard extends React.Component {
 							placeholder="A link to Pokemons's image"
 							value={this.props.pokemon.url}
 							disabled={!editable}
-							onChange={(e) => this.props.onUrlChange(e.target.value)}
+							name="url"
+							onChange={this._inputUpdate}
 						/>
 					</div>
 					<div className={classes.cardImageWrapper}>
@@ -58,7 +69,7 @@ class PokemonCard extends React.Component {
 	}
 }
 
-export default createFragmentContainer(PokemonCard, {
+export const PokemonCardRelay = createFragmentContainer(PokemonCard, {
 	pokemon: graphql`
 		fragment PokemonCard_pokemon on Pokemon {
 			id,

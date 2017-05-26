@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-relay';
 
-import PokemonCard from '../components/PokemonCard';
+import { PokemonCardRelay as PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
 import QueryViewer from './QueryViewer';
 

@@ -1,66 +1,88 @@
 import React from 'react';
-import Relay from 'react-relay/classic';
+
 import PropTypes from 'prop-types';
-import PokemonCard from '../components/PokemonCard';
-import CreatePokemonMutation from '../mutations/CreatePokemonMutation';
+import { PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
+import createPokemon from '../mutations/CreatePokemon';
+import updatePokemon from '../mutations/UpdatePokemon';
 
 class CreatePokemonPage extends React.Component {
 	static contextTypes = {
 		router: PropTypes.object,
 	}
 
-	static propTypes = {
-		viewer: PropTypes.object,
-		relay: PropTypes.object.isRequired,
-	}
-
-	constructor (props) {
-		super(props);
-		this.state = {
+	state = {
+		added: false,
+		pokemon: {
+			id: '',
 			name: '',
 			url: '',
-			id: '',
-		};
-	}
+		}
+	};
 
 	_addPokemon = () => {
-		Relay.Store.commitUpdate(
-			new CreatePokemonMutation({name: this.state.name, url: this.state.url, viewer: this.props.viewer}),
-			{
-				onSuccess: (response) => {
-					console.log('Pokemon added', response);
-					this.props.relay.setVariables({
-						id: response.createPokemon.pokemon.id,
-					});
-				},
-				onFailure: (transaction) => console.log(transaction),
+		createPokemon({
+			input: {
+				clientMutationId: String(Date.now()),
+				name: this.state.pokemon.name,
+				url: this.state.pokemon.url,
 			},
-		);
+			onCompleted: (response) => {
+				console.log('Create Success! Payload:', response);
+				this.setState({ added: true, pokemon: response.createPokemon.pokemon });
+			},
+			onError: err => console.error(err),
+		});
+	}
+
+	_editPokemon = () => {
+		updatePokemon({
+			input: {
+				clientMutationId: String(Date.now()),
+				id: this.state.pokemon.id,
+				name: this.state.pokemon.name,
+				url: this.state.pokemon.url,
+			},
+			onCompleted: (response) => {
+				console.log('Update Success! Payload:', response);
+				this.setState({ added: true, pokemon: response.updatePokemon.pokemon });
+			},
+			onError: err => console.error(err),
+		});
 	}
 
 	_onCTA = () => {
-		if (this.props.viewer.Pokemon) {
-			// pokemon added and available in graph
-			this.context.router.push('/');
+		if (this.state.added) {
+			this._editPokemon();
 		} else {
 			this._addPokemon();
 		}
 	}
 
+	_onPokemonCardNameChange = (name) => {
+		this.setState({
+			pokemon: Object.assign({}, this.state.pokemon, {name})
+		});
+	}
+
+	_onPokemonCardUrlChange = (url) => {
+		// I'm carelessly alter current pokemon state
+		this.setState({
+			pokemon: Object.assign({}, this.state.pokemon, { url })
+		});
+	}
+
 	render () {
-		const pokemonAdded = !!this.props.viewer.Pokemon;
+		const pokemonAdded = !!this.state.added;
 
 		return (
 			<div className={classes.root}>
 				<div className={classes.content}>
 					<PokemonCard
 						addNew
-						id={this.state.id}
-						name={this.state.name}
-						url={this.state.url}
-						onNameChange={(newName) => this.setState({name: newName})}
-						onUrlChange={(newUrl) => this.setState({url: newUrl})}
+						pokemon={this.state.pokemon}
+						onNameChange={this._onPokemonCardNameChange}
+						onUrlChange={this._onPokemonCardUrlChange}
 					/>
 					<div className={classes.buttonContainer}>
 						<div className={classes.actionButtonContainer}>
@@ -85,31 +107,4 @@ class CreatePokemonPage extends React.Component {
 	}
 }
 
-export default Relay.createContainer(
-	CreatePokemonPage,
-	{
-		initialVariables: {
-			id: null,
-			pokemonExists: false,
-		},
-		prepareVariables: (prevVariables) => {
-			// console.log('view id:', prevVariables.id)
-			return Object.assign({}, prevVariables, {
-				pokemonExists: prevVariables.id !== null,
-			});
-		},
-		fragments: {
-			viewer: () => Relay.QL`
-				fragment on Viewer {
-					id
-					${CreatePokemonMutation.getFragment('viewer')}
-					Pokemon(id: $id) @include( if: $pokemonExists ) {
-						id
-						name
-						url
-					}
-				}
-			`,
-		},
-	}
-);
+export default CreatePokemonPage;
