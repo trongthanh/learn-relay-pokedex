@@ -41,8 +41,9 @@ module.exports = {
 		'strict'                      : 0,
 		'valid-jsdoc'                 : 2,
 		'jsx-quotes'                  :[2, 'prefer-double'],
-		// 'react/jsx-no-bind'           : 2,
-		// 'react/prop-types'            : 0,
+		'react/display-name'          : 0,
+		'react/prop-types'            : 0,
+		'react/jsx-no-bind'           : 0,
 	},
 	'globals': {
 

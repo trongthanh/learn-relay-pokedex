@@ -1,48 +1,46 @@
 import React from 'react';
-import Relay from 'react-relay/classic';
-import PokemonPreview from '../components/PokemonPreview';
-import AddNew from '../components/AddNew';
+import PropTypes from 'prop-types';
+import { QueryRenderer, graphql } from 'react-relay';
+
+import environment from '../relayEnvironment';
+import PokemonList from '../components/PokemonList';
 import classes from './ListPage.css';
 
 class ListPage extends React.Component {
 	static propTypes = {
-		viewer: React.PropTypes.object,
+		viewer: PropTypes.object,
 	}
+
 	render () {
 		return (
 			<div className={classes.root}>
-				<div className={classes.title}>
-					{`There are ${this.props.viewer.allPokemons.edges.length} Pokemons in your pokedex`}
-				</div>
-				<div className={classes.container}>
-					{this.props.viewer.allPokemons.edges.map((edge) => edge.node).map((pokemon) =>
-						<PokemonPreview key={pokemon.id} pokemon={pokemon} />
-					)
-					}
-					<AddNew />
-				</div>
+				<QueryRenderer
+					environment={environment}
+					variables={{}}
+					query={graphql`
+						query ListPageQuery {
+							viewer {
+								allPokemons(first: 100) {
+									...PokemonList
+								}
+							}
+						}
+					`}
+
+					render={({ error, props }) => {
+						if (error) {
+							return <div>{error.message}</div>;
+						} else if (props) {
+							// always render wrapped component, based on viewer availability to decide loading status
+							return <PokemonList data={props.viewer.allPokemons} />;
+						}
+						return <div className={classes.root}><div>Loading...</div></div>;
+					}}
+				/>
 			</div>
 		);
 	}
 }
 
-export default Relay.createContainer(
-	ListPage,
-	{
-		fragments: {
-			viewer: () => Relay.QL`
-				fragment on Viewer {
-					id,
-					allPokemons (first: 100000) {
-						edges {
-							node {
-								${PokemonPreview.getFragment('pokemon')}
-								id
-							}
-						}
-					}
-				}
-			`,
-		},
-	},
-);
+// export default createQueryViewer(ListPage);
+export default ListPage;

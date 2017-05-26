@@ -1,17 +1,18 @@
 import React from 'react';
 import Relay from 'react-relay/classic';
+import PropTypes from 'prop-types';
 import PokemonCard from '../components/PokemonCard';
 import CreatePokemonMutation from '../mutations/CreatePokemonMutation';
 import classes from './PokemonPage.css';
 
 class CreatePokemonPage extends React.Component {
 	static contextTypes = {
-		router: React.PropTypes.object,
+		router: PropTypes.object,
 	}
 
 	static propTypes = {
-		viewer: React.PropTypes.object,
-		relay: React.PropTypes.object.isRequired,
+		viewer: PropTypes.object,
+		relay: PropTypes.object.isRequired,
 	}
 
 	constructor (props) {

@@ -1,15 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classes from './PokemonCard.css';
+import { createFragmentContainer, graphql } from 'react-relay';
 
-export default class PokemonCard extends React.Component {
+class PokemonCard extends React.Component {
 
 	static propTypes = {
-		addNew: React.PropTypes.bool,
-		id: React.PropTypes.string,
-		url: React.PropTypes.string,
-		name: React.PropTypes.string,
-		onNameChange: React.PropTypes.func,
-		onUrlChange: React.PropTypes.func,
+		addNew: PropTypes.bool,
+		pokemon: PropTypes.shape({
+			id: PropTypes.string,
+			url: PropTypes.string,
+			name: PropTypes.string,
+		}),
+		onNameChange: PropTypes.func,
+		onUrlChange: PropTypes.func,
 	}
 
 	render () {
@@ -24,7 +28,7 @@ export default class PokemonCard extends React.Component {
 					<input
 						className={classes.content + ' ' + (this.props.addNew ? classes.newContent : '') + ' ' + classes.name}
 						placeholder="Type a name..."
-						value={this.props.name}
+						value={this.props.pokemon.name}
 						disabled={!editable}
 						onChange={(e) => this.props.onNameChange(e.target.value)}
 					/>
@@ -37,19 +41,29 @@ export default class PokemonCard extends React.Component {
 						<input
 							className={classes.content + ' ' + (this.props.addNew ? classes.newContent : '') + ' ' + classes.link}
 							placeholder="A link to Pokemons's image"
-							value={this.props.url}
+							value={this.props.pokemon.url}
 							disabled={!editable}
 							onChange={(e) => this.props.onUrlChange(e.target.value)}
 						/>
 					</div>
 					<div className={classes.cardImageWrapper}>
-						<img className={classes.cardImage} src={this.props.url} />
+						<img className={classes.cardImage} src={this.props.pokemon.url} />
 					</div>
 					<div>
-						ID: {this.props.id ? this.props.id : 'N/A'}
+						ID: {this.props.pokemon.id ? this.props.pokemon.id : 'N/A'}
 					</div>
 				</div>
 			</div>
 		);
 	}
 }
+
+export default createFragmentContainer(PokemonCard, {
+	pokemon: graphql`
+		fragment PokemonCard_pokemon on Pokemon {
+			id,
+			name,
+			url,
+		}
+	`
+});

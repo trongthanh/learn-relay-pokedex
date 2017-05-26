@@ -1,5 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay/classic';
+import PropTypes from 'prop-types';
 import PokemonCard from '../components/PokemonCard';
 import DeletePokemonMutation from '../mutations/DeletePokemonMutation';
 import UpdatePokemonMutation from '../mutations/UpdatePokemonMutation';
@@ -8,12 +9,12 @@ import classes from './PokemonPage.css';
 
 class EditPokemonPage extends React.Component {
 	static contextTypes = {
-		router: React.PropTypes.object,
+		router: PropTypes.object,
 	}
 
 	static propTypes = {
-		viewer: React.PropTypes.object,
-		params: React.PropTypes.object,
+		viewer: PropTypes.object,
+		params: PropTypes.object,
 	}
 
 	constructor (props) {
