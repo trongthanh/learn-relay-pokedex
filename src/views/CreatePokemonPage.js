@@ -1,5 +1,4 @@
 import React from 'react';
-
 import PropTypes from 'prop-types';
 import { PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
@@ -11,12 +10,20 @@ class CreatePokemonPage extends React.Component {
 		router: PropTypes.object,
 	}
 
+	static propTypes = {
+		pokemon: PropTypes.shape({
+			id: PropTypes.string,
+			name: PropTypes.string,
+			url: PropTypes.string,
+		})
+	}
+
 	state = {
-		added: false,
+		added: !!this.props.pokemon,
 		pokemon: {
-			id: '',
-			name: '',
-			url: '',
+			id: this.props.pokemon ? this.props.pokemon.id : '',
+			name: this.props.pokemon ? this.props.pokemon.name : '',
+			url: this.props.pokemon ? this.props.pokemon.url : '',
 		}
 	};
 
@@ -73,6 +80,7 @@ class CreatePokemonPage extends React.Component {
 	}
 
 	render () {
+		console.log('CPP props', this.props, this.state);
 		const pokemonAdded = !!this.state.added;
 
 		return (

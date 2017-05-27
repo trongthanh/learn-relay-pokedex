@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-relay';
+import { Link } from 'react-router';
 
 import { PokemonCardRelay as PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
@@ -22,7 +23,7 @@ class PokemonPage extends React.Component {
 	}
 
 	_onEdit = () => {
-		this.context.router.push('/edit/' + this.state.id);
+		this.context.router.push('/edit/' + this.props.viewer.Pokemon.id);
 	}
 
 	render () {
@@ -35,18 +36,20 @@ class PokemonPage extends React.Component {
 
 					<div className={classes.buttonContainer}>
 						<div className={classes.actionButtonContainer}>
-							<div
+							<Link
 								className={classes.button + ' ' + classes.cancelButton}
-								onClick={this._onBack}
+								to="/"
 							>
 								Back
-							</div>
-							<div
+							</Link>
+						{this.props.viewer &&
+							<Link
 								className={classes.button + ' ' + classes.saveButton}
-								onClick={this._onEdit}
+								to={`/edit/${this.props.viewer.Pokemon.id}`}
 							>
 								Edit
-							</div>
+							</Link>
+						}
 						</div>
 					</div>
 				</div>
@@ -67,6 +70,7 @@ export default class PokemonPageViewer extends React.Component {
 		query PokemonPageQuery($id: ID!) {
 			viewer {
 				Pokemon(id: $id) {
+					id,
 					...PokemonCard_pokemon
 				}
 			}
