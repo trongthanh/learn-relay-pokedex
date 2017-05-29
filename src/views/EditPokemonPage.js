@@ -1,126 +1,60 @@
 import React from 'react';
-import Relay from 'react-relay';
-import PokemonCard from '../components/PokemonCard';
-import DeletePokemonMutation from '../mutations/DeletePokemonMutation';
-import UpdatePokemonMutation from '../mutations/UpdatePokemonMutation';
-import deleteIcon from '../assets/delete.svg';
-import classes from './PokemonPage.css';
+import PropTypes from 'prop-types';
+import { createFragmentContainer, graphql } from 'react-relay';
 
-class EditPokemonPage extends React.Component {
-	static contextTypes = {
-		router: React.PropTypes.object,
-	}
+import CreatePokemonPage from './CreatePokemonPage';
+import QueryViewer from './QueryViewer';
 
+const PokemonEditContainer = createFragmentContainer(CreatePokemonPage, {
+	pokemon: graphql`
+		fragment EditPokemonPage_pokemon on Pokemon {
+			id,
+			name,
+			url,
+		}
+	`
+});
+
+const EditPokemonViewer = ({viewer}) => {
+	return (
+		<PokemonEditContainer pokemon={viewer.Pokemon} />
+	);
+};
+
+export default class EditPokemonPage extends React.Component {
 	static propTypes = {
-		viewer: React.PropTypes.object,
-		params: React.PropTypes.object,
+		params: PropTypes.shape({
+			id: PropTypes.string,
+		}),
 	}
 
-	constructor (props) {
-		super(props);
-		this.state = {
-			id: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.id : '',
-			name: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.name : '',
-			url: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.url : '',
-		};
-	}
+	static query = graphql`
+		query EditPokemonPageQuery($id: ID!) {
+			viewer {
+				Pokemon(id: $id) {
+					...EditPokemonPage_pokemon
+				}
+			}
+		}
+	`
 
-	_updatePokemon = () => {
-		Relay.Store.commitUpdate(
-			new UpdatePokemonMutation({name: this.state.name, url: this.state.url, pokemonId: this.props.viewer.Pokemon.id, pokemon: null}),
-			{
-				onSuccess: () => { console.log('Pokemon updated', this.props.viewer.Pokemon.id); },
-				onFailure: (transaction) => console.log(transaction),
-			},
-		);
-	}
-
-	_deletePokemon = () => {
-		Relay.Store.commitUpdate(
-			new DeletePokemonMutation({pokemonId: this.props.params.id, viewerId: this.props.viewer.id}),
-			{
-				onSuccess: () => this.context.router.replace('/'),
-				onFailure: (transaction) => console.log(transaction),
-			},
-		);
-	}
-
-	_goBack = () => {
-		this.context.router.push('/');
-	}
-
-	render () {
-		const shouldPreviewRendered = !!this.props.viewer.Pokemon;
+	render() {
 		return (
-			<div className={classes.root}>
-				<div className={classes.content}>
-					<div style={{display: 'flex', flexDirection: 'row'}}>
-						<PokemonCard
-							id={this.state.id}
-							name={this.state.name}
-							url={this.state.url}
-							onNameChange={(newName) => this.setState({name: newName})}
-							onUrlChange={(newUrl) => this.setState({url: newUrl})}
-						/>
-						{
-						shouldPreviewRendered &&
-							<PokemonCard
-								id={this.props.viewer.Pokemon.id}
-								name={this.props.viewer.Pokemon.name}
-								url={this.props.viewer.Pokemon.url}
-							/>
-						}
-					</div>
-					<div className={classes.buttonContainer}>
-						<div>
-							<img src={deleteIcon} className={classes.deleteIcon} onClick={this._deletePokemon} />
-						</div>
-						<div className={classes.actionButtonContainer}>
-							<div
-								className={classes.button + ' ' + classes.cancelButton}
-								onClick={this._goBack}
-							>
-								Cancel
-							</div>
-							<div
-								className={classes.button + ' ' + classes.saveButton}
-								onClick={this._updatePokemon}
-							>
-								Save
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<QueryViewer
+				variables={{
+					id: this.props.params.id,
+				}}
+				query={EditPokemonPage.query}
+				component={EditPokemonViewer}
+			>
+				<div>loading</div>
+			</QueryViewer>
 		);
 	}
 }
 
-export default Relay.createContainer(
-	EditPokemonPage,
-	{
-		initialVariables: {
-			id: null,
-			pokemonExists: false,
-		},
-		prepareVariables: (prevVariables) => {
-			// console.log('view id:', prevVariables.id)
-			return Object.assign({}, prevVariables, {
-				pokemonExists: prevVariables.id !== null,
-			});
-		},
-		fragments: {
-			viewer: () => Relay.QL`
-				fragment on Viewer {
-					id
-					Pokemon(id: $id) @include( if: $pokemonExists ) {
-						${UpdatePokemonMutation.getFragment('pokemon')}
-						id,
-						name,
-						url
-					}
-				}
-			`,
-		},
-	},
-);
+
+
+
+
+

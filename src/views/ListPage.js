@@ -1,48 +1,50 @@
 import React from 'react';
-import Relay from 'react-relay';
-import PokemonPreview from '../components/PokemonPreview';
-import AddNew from '../components/AddNew';
+import PropTypes from 'prop-types';
+import { graphql } from 'react-relay';
+
+import PokemonList from '../components/PokemonList';
 import classes from './ListPage.css';
+import QueryViewer from './QueryViewer';
+
 
 class ListPage extends React.Component {
 	static propTypes = {
-		viewer: React.PropTypes.object,
+		viewer: PropTypes.object,
 	}
-	render () {
+
+	render() {
 		return (
 			<div className={classes.root}>
-				<div className={classes.title}>
-					{`There are ${this.props.viewer.allPokemons.edges.length} Pokemons in your pokedex`}
-				</div>
-				<div className={classes.container}>
-					{this.props.viewer.allPokemons.edges.map((edge) => edge.node).map((pokemon) =>
-						<PokemonPreview key={pokemon.id} pokemon={pokemon} />
-					)
-					}
-					<AddNew />
-				</div>
+				<PokemonList data={this.props.viewer.allPokemons} />
 			</div>
 		);
 	}
 }
 
-export default Relay.createContainer(
-	ListPage,
-	{
-		fragments: {
-			viewer: () => Relay.QL`
-				fragment on Viewer {
-					id,
-					allPokemons (first: 100000) {
-						edges {
-							node {
-								${PokemonPreview.getFragment('pokemon')}
-								id
-							}
-						}
-					}
+
+export default class ListPageViewer extends React.Component {
+
+	static query = graphql`
+		query ListPageQuery {
+			viewer {
+				allPokemons(first: 100) {
+					...PokemonList
 				}
-			`,
-		},
-	},
-);
+			}
+		}
+	`
+
+	render () {
+		return (
+			<QueryViewer
+				query={ListPageViewer.query}
+				component={ListPage}
+			>
+				<div className={classes.root}>
+					<div className={classes.middle}>Go grabbing some pokemons...</div>
+				</div>
+			</QueryViewer>
+		);
+	}
+}
+

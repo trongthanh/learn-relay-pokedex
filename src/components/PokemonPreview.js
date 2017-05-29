@@ -1,13 +1,15 @@
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import classes from './PokemonPreview.css';
+import { createFragmentContainer, graphql } from 'react-relay/compat';
 
 class PokemonPreview extends React.Component {
 
 	static propTypes = {
-		pokemon: React.PropTypes.object,
-		router: React.PropTypes.object,
+		pokemon: PropTypes.object,
+		router: PropTypes.object,
 	}
 
 	render () {
@@ -24,17 +26,15 @@ class PokemonPreview extends React.Component {
 	}
 }
 
-export default Relay.createContainer(
+export default createFragmentContainer(
 	PokemonPreview,
 	{
-		fragments: {
-			pokemon: () => Relay.QL`
-				fragment on Pokemon {
-					id
-					name
-					url
-				}
-			`,
-		},
+		pokemon: graphql`
+			fragment PokemonPreview_pokemon on Pokemon {
+				id
+				name
+				url
+			}
+		`,
 	}
 );

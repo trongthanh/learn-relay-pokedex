@@ -34,24 +34,37 @@
 }
 
 .deleteIcon {
-  height: 18px;
-  padding: 10px;
+  padding: 15px;
   cursor: hand;
   cursor: pointer;
 }
+.deleteIcon img {
+  height: 18px;
+}
+
+.deleteIcon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
 .button {
-  height: 18px;
   line-height: 1;
   font-size: 18px;
   padding: 15px 30px;
   cursor: pointer;
   flex: 0 0 auto;
   font-weight: 300;
+  border: 0;
+  text-decoration: none;
 }
 
 .cancelButton {
+  border-radius: 3px;
   color: #A3A3A3;
+  margin-right: 1rem;
+}
+
+.cancelButton:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .saveButton {

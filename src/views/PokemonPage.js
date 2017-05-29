@@ -1,25 +1,21 @@
 import React from 'react';
-import Relay from 'react-relay';
-import PokemonCard from '../components/PokemonCard';
+import PropTypes from 'prop-types';
+import { graphql } from 'react-relay';
+import { Link } from 'react-router';
+
+import { PokemonCardRelay as PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
+import QueryViewer from './QueryViewer';
 
 class PokemonPage extends React.Component {
 	static contextTypes = {
-		router: React.PropTypes.object,
+		router: PropTypes.object,
 	}
 
 	static propTypes = {
-		viewer: React.PropTypes.object,
-		params: React.PropTypes.object,
-	}
-
-	constructor (props) {
-		super(props);
-		this.state = {
-			id: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.id : '',
-			name: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.name : '',
-			url: this.props.viewer.Pokemon ? this.props.viewer.Pokemon.url : '',
-		};
+		viewer: PropTypes.object,
+		loading: PropTypes.bool,
+		relay: PropTypes.object,
 	}
 
 	_onBack = () => {
@@ -27,65 +23,75 @@ class PokemonPage extends React.Component {
 	}
 
 	_onEdit = () => {
-		this.context.router.push('/edit/' + this.state.id);
+		this.context.router.push('/edit/' + this.props.viewer.Pokemon.id);
 	}
 
 	render () {
+		console.log('Pokemon Page', this.props);
 		return (
 			<div className={classes.root}>
 				<div className={classes.content}>
-					<PokemonCard
-						id={this.state.id}
-						name={this.state.name}
-						url={this.state.url}
-					/>
-					<div className={classes.buttonContainer}>
+					{this.props.viewer && <PokemonCard pokemon={this.props.viewer.Pokemon} />}
+					{this.props.loading && <div>Catching a pokemon...</div> }
 
+					<div className={classes.buttonContainer}>
 						<div className={classes.actionButtonContainer}>
-							<div
+							<Link
 								className={classes.button + ' ' + classes.cancelButton}
-								onClick={this._onBack}
+								to="/"
 							>
 								Back
-							</div>
-							<div
+							</Link>
+						{this.props.viewer &&
+							<Link
 								className={classes.button + ' ' + classes.saveButton}
-								onClick={this._onEdit}
+								to={`/edit/${this.props.viewer.Pokemon.id}`}
 							>
 								Edit
-							</div>
+							</Link>
+						}
 						</div>
 					</div>
 				</div>
+
 			</div>
 		);
 	}
 }
 
-export default Relay.createContainer(
-	PokemonPage,
-	{
-		initialVariables: {
-			id: null,
-			pokemonExists: false,
-		},
-		prepareVariables: (prevVariables) => {
-			// console.log('view id:', prevVariables.id)
-			return Object.assign({}, prevVariables, {
-				pokemonExists: prevVariables.id !== null,
-			});
-		},
-		fragments: {
-			viewer: () => Relay.QL`
-				fragment on Viewer {
+export default class PokemonPageViewer extends React.Component {
+	static propTypes = {
+		params: PropTypes.shape({
+			id: PropTypes.string,
+		}),
+	}
+
+	static query = graphql`
+		query PokemonPageQuery($id: ID!) {
+			viewer {
+				Pokemon(id: $id) {
 					id,
-					Pokemon(id: $id) @include( if: $pokemonExists ) {
-						id
-						name
-						url
-					}
+					...PokemonCard_pokemon
 				}
-			`,
-		},
-	},
-);
+			}
+		}
+	`
+
+	render() {
+		return (
+			<QueryViewer
+				variables={{
+					id: this.props.params.id,
+				}}
+				query={PokemonPageViewer.query}
+				component={PokemonPage}
+			>
+				<PokemonPage loading />
+			</QueryViewer>
+		);
+	}
+}
+
+
+
+
