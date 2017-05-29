@@ -1,45 +1,27 @@
-import Relay from 'react-relay/classic';
+import { commitMutation, graphql } from 'react-relay';
+import environment from '../relayEnvironment';
 
-export default class DeletePokemonMutation extends Relay.Mutation {
-
-	getMutation () {
-		return Relay.QL`mutation{deletePokemon}`;
-	}
-
-	getFatQuery () {
-		return Relay.QL`
-		fragment on DeletePokemonPayload {
-			viewer
+const mutation = graphql`
+	mutation DeletePokemonMutation ($input: DeletePokemonInput!) {
+		deletePokemon(input: $input) {
 			deletedId
 		}
-		`;
 	}
+`;
 
-	getConfigs () {
-		return [{
-			type: 'NODE_DELETE',
-			parentName: 'viewer',
-			parentID: this.props.viewerId,
-			connectionName: 'pokemon',
-			deletedIDFieldName: 'deletedId',
-		}];
-	}
+const deletePokemon = ({ input, onCompleted, onError }) => {
+	// TODO: should validate the input here
+	const variables = {
+		input
+	};
 
-	getVariables () {
-		return {
-			id: this.props.pokemonId,
-		};
-	}
+	commitMutation(environment, {
+		mutation,
+		variables,
+		onCompleted,
+		onError,
+	});
 
-	getOptimisticResponse () {
-		return {
-			deletedId: this.props.pokemonId,
-			pokemon: {
-				id: this.props.pokemonId,
-				name: 'Deleting...',
-				url: 'Deleting...',
-			},
-		};
-	}
-}
+};
 
+export default deletePokemon;

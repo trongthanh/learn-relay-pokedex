@@ -18,10 +18,21 @@ const updatePokemon = ({ input, onCompleted, onError }) => {
 		input
 	};
 
+	const optimisticResponse = () => ({
+		updatePokemon: {
+			pokemon: {
+				id: input.id,
+				name: input.name,
+				url: input.url,
+			}
+		}
+	});
+
 	commitMutation(environment, {
 		mutation,
 		variables,
 		onCompleted,
+		optimisticResponse,
 		onError,
 	});
 

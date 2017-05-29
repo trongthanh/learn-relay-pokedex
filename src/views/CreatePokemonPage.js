@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { PokemonCard } from '../components/PokemonCard';
 import classes from './PokemonPage.css';
 import createPokemon from '../mutations/CreatePokemon';
 import updatePokemon from '../mutations/UpdatePokemon';
+import deletePokemon from '../mutations/DeletePokemon';
+import deleteIcon from '../assets/delete.svg';
 
 class CreatePokemonPage extends React.Component {
 	static contextTypes = {
@@ -36,7 +39,9 @@ class CreatePokemonPage extends React.Component {
 			},
 			onCompleted: (response) => {
 				console.log('Create Success! Payload:', response);
-				this.setState({ added: true, pokemon: response.createPokemon.pokemon });
+				// this.setState({ added: true, pokemon: response.createPokemon.pokemon });
+				// navigate to edit page for a consistent workflow (although it is possible to enable editing in here)
+				this.context.router.push('/edit/' + response.createPokemon.pokemon.id);
 			},
 			onError: err => console.error(err),
 		});
@@ -53,6 +58,20 @@ class CreatePokemonPage extends React.Component {
 			onCompleted: (response) => {
 				console.log('Update Success! Payload:', response);
 				this.setState({ added: true, pokemon: response.updatePokemon.pokemon });
+			},
+			onError: err => console.error(err),
+		});
+	}
+
+	_deletePokemon = () => {
+		deletePokemon({
+			input: {
+				clientMutationId: String(Date.now()),
+				id: this.state.pokemon.id,
+			},
+			onCompleted: (response) => {
+				console.log('Update Success! Payload:', response);
+				this.context.router.push('/');
 			},
 			onError: err => console.error(err),
 		});
@@ -80,7 +99,7 @@ class CreatePokemonPage extends React.Component {
 	}
 
 	render () {
-		console.log('CPP props', this.props, this.state);
+		console.log('CreatePokemonPage Rerender', this.props, this.state);
 		const pokemonAdded = !!this.state.added;
 
 		return (
@@ -93,20 +112,24 @@ class CreatePokemonPage extends React.Component {
 						onUrlChange={this._onPokemonCardUrlChange}
 					/>
 					<div className={classes.buttonContainer}>
+						<a onClick={this._deletePokemon} className={classes.deleteIcon}>
+							<img src={deleteIcon} />
+						</a>
+
 						<div className={classes.actionButtonContainer}>
-							<div
+							<a
 								className={classes.button + ' ' + classes.cancelButton}
 								onClick={() => this.context.router.push('/')}
 							>
 								{pokemonAdded ? 'Back' : 'Cancel'}
-							</div>
+							</a>
 
-							<div
+							<a
 								className={classes.button + ' ' + classes.saveButton}
 								onClick={this._onCTA}
 							>
-								{pokemonAdded ? 'Edit' : 'Add'}
-							</div>
+								{pokemonAdded ? 'Save' : 'Add'}
+							</a>
 						</div>
 					</div>
 				</div>
